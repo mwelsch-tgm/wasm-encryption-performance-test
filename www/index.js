@@ -1,5 +1,6 @@
 import * as wasm from "test-encryption";
 
+let dataset = [];
 
 
 const runTests = () => {
@@ -55,6 +56,7 @@ const runTests = () => {
     }
 
     //generate table
+    var avgs = [];
     var table = "<table> <tr><th>Methode</th><th>avg time [ms]</th><th>max time [ms]</th><th>min time [ms]</th></tr>";
     for (let i = 0; i<cryptos.length;i++){
         var sum = 0;
@@ -63,6 +65,7 @@ const runTests = () => {
             sum += parseInt( array[i], 10 );
         }
         var avg = sum/array.length;
+        avgs.push(avg);
         var min = Math.min.apply(Math,array);
         var max = Math.max.apply(Math,array);
         table += "<tr><td>" + cryptos[i] + "</td><td> "+ avg +"</td><td> "+ max +"</td><td> "+ min +"</td></tr>";
@@ -70,8 +73,101 @@ const runTests = () => {
     }
     table += "</table>";
 
-    document.getElementById("tbl").innerHTML += table;
+    document.getElementById("tbl").innerHTML = table;
+
+    // create ChartJS stuff
+    var ctx = document.getElementById('myChart').getContext('2d');
+    dataset = [avgs[0], avgs[1], avgs[2], avgs[3], avgs[4]];
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['C2', 'Blowfish', 'rust-crypto-aes', 'aes_256', 'rust-crypto-blowfish'],
+            datasets: [{
+                label: 'avg ms',
+                //TODO insert data dynamically
+                data: [avgs[0], avgs[1], avgs[2], avgs[3], avgs[4]],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
 }
+const testAlphabet  = () => {
+    var alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+
+    var upperAlphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase();
+    upperAlphabet = upperAlphabet.split("");
+    alphabet.push.apply(upperAlphabet);
+
+    var text = document.getElementById("text1").value;
+
+    var datasets = new Map();
+    for (let i = 0; i<alphabet.length;i++){
+        document.getElementById("text1").value = alphabet[i];
+        runTests();
+        datasets.set(alphabet[i],dataset);
+    }
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var label = [];
+    var data = [];
+    for (var [key, value] of datasets.entries()) {
+        console.log(key + ' = ' + value);
+
+        label.push(key);
+        var tmp ={
+            label: key,
+            data: value,
+        };
+        data.push(tmp);
+    }
+    console.log(data);
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: label,
+            datasets: data
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+
+}
+
 $(document).ready(function() {
     $("#run").click(runTests);
+    $("#runAlphabet").click(testAlphabet);
 });

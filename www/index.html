@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>Hello wasm-pack!</title>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js" integrity="sha256-xKeoJ50pzbUGkpQxDYHD7o7hxe0LaOGeguUidbq6vis=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   </head>
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
@@ -12,8 +13,13 @@
     How often the encryption should be run:<input type="number" id="number1"><br>
     How often all tests should be run (to determine ±): <input type="number" id="number2"><br>
     <input type="button" value="runTests" id="run" >
+    <input type="button" value="test whole alphabet" id="runAlphabet" >
   <div id="tbl">
 
   </div>
+    <div class="chart-container" style="position: relative; height:35vh; width:80vw">
+      <canvas id="myChart"></canvas>
+    </div>
+
   </body>
 </html>

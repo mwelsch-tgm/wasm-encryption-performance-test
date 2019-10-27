@@ -1,4 +1,8 @@
-## Evaluation of the crypto libs
+# Evaluation of crypto libs for developing with wasm
+
+This is a simple tool to benchmark the following crypto-libraries which I implemented according to their example in the documentation or repo:
+
+
 ### rust-crypto
 - aes has complex "sample" code
 - works(?)
@@ -11,6 +15,8 @@
 - chacha20 is convininent
 ### blowfish with cbc
 - buffer for encryption has to be set statically ??? (probably able to work around that tho)
+
+## Since I used the rust-wasm template I'll leave this here
 
 <div align="center">
 
