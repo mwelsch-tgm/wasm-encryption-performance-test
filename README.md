@@ -1,8 +1,14 @@
 # Evaluation of crypto libs for developing with wasm
 
 This is a simple tool to benchmark the following crypto-libraries which I implemented according to their example in the documentation or repo:
-
-
+## Usage
+```
+wasm-pack build
+cd www
+npm install
+npm run start
+```
+now the website is served on `localhost:8080`
 ### rust-crypto
 - aes has complex "sample" code
 - works(?)
@@ -16,7 +22,9 @@ This is a simple tool to benchmark the following crypto-libraries which I implem
 ### blowfish with cbc
 - buffer for encryption has to be set statically ??? (probably able to work around that tho)
 
-## Since I used the rust-wasm template I'll leave this here
+
+
+# Since I used the rust-wasm template I'll leave this here
 
 <div align="center">
 
