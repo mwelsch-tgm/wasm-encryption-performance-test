@@ -32,7 +32,10 @@
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5",
     "copy-webpack-plugin": "^5.0.0",
-    "test-encryption": "file:../pkg"
+    "test-encryption": "file:../pkg",
+    "benchmark": "^2.1.4",
+    "lodash": "^4.17.15",
+    "microtime": "^3.0.0"
   },
   "dependencies": {
     "run": "^1.4.0"

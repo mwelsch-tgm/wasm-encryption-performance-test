@@ -11,4 +11,9 @@ module.exports = {
   plugins: [
     new CopyWebpackPlugin(['index.html'])
   ],
+  module: {
+    noParse: [
+      /benchmark/,
+    ]
+  },
 };

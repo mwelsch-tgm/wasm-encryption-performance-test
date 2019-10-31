@@ -1,6 +1,70 @@
 import * as wasm from "test-encryption";
+import _ from 'lodash';
+import process from 'process';
+
+const benchmark = require('benchmark');
+const Benchmark = benchmark.runInContext({ _, process });
+window.Benchmark = Benchmark;
+
+Benchmark.options.maxTime = 1;
+
 
 let dataset = [];
+
+
+
+
+const testing = () => {
+
+
+    var suite = new Benchmark.Suite;
+    suite.on('cycle', function(event) {
+        console.log(String(event.target));
+    });
+    suite.add("c2chacha20_encrypt_decrypt", function (){
+        var key = "aklsöjdfkölasdjfk";
+        var text = document.getElementById("text1").value;
+        wasm.c2chacha20_encrypt_decrypt(text,key);
+
+    });
+    suite.add("blowfish_cbc_encrypt_decrypt", function (){
+        var key = "aklsöjdfkölasdjfk";
+        var text = document.getElementById("text1").value;
+        wasm.blowfish_cbc_encrypt_decrypt(text,key);
+
+    });
+  /*  suite.add("rust_crypto_aes_encrypt_decrypt", function (){
+        var key = "aklsöjdfkölasdjfk";
+        var text = document.getElementById("text1").value;
+        wasm.rust_crypto_aes_encrypt_decrypt(text,key);
+
+    });
+    suite.add("aes_256_gcm_siv_encrypt_decrypt", function (){
+        var key = "aklsöjdfkölasdjfk";
+        var text = document.getElementById("text1").value;
+        wasm.aes_256_gcm_siv_encrypt_decrypt(text,key);
+
+    });
+    suite.add("rust_crypto_blowfish_encrypt_decrypt", function (){
+        var key = "aklsöjdfkölasdjfk";
+        var text = document.getElementById("text1").value;
+        wasm.rust_crypto_blowfish_encrypt_decrypt(text,key);
+
+    });*/
+    suite.on('complete', function() {
+            console.log('Fastest is ' + this.filter('fastest').map('name') + "ALL:" +  typeof(this));
+    });
+    // run async
+    suite.run({ 'async': false });
+}
+
+
+
+
+
+
+
+
 
 
 const runTests = () => {
@@ -170,4 +234,5 @@ const testAlphabet  = () => {
 $(document).ready(function() {
     $("#run").click(runTests);
     $("#runAlphabet").click(testAlphabet);
+    $("#bench").click(testing);
 });
