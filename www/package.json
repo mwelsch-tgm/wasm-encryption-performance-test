@@ -38,6 +38,7 @@
     "microtime": "^3.0.0"
   },
   "dependencies": {
+    "ngrok": "^3.2.5",
     "run": "^1.4.0"
   }
 }
