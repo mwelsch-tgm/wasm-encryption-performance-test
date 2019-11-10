@@ -64,7 +64,10 @@ const testing = () => {
 
     });*/
     suite.on('complete', function() {
-            console.log('Fastest is ' + this.filter('fastest').map('name') + "ALL:" +  typeof(this));
+        for (let i = 0; i < this.length; i++) {
+            console.log("Function " + this[i].name + " Avg time:" + this[i].stats.mean)
+        }
+            //console.log('Fastest is ' + this.filter('fastest').map('name') + "ALL:" +  this[0].stats.mean);
     });
     // run async
     suite.run({ 'async': false });
