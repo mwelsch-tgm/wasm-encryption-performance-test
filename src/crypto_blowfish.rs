@@ -9,13 +9,14 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn rust_crypto_blowfish_encrypt_decrypt(message: &str, key: &str){
-    let  key = "very secret key-the most secret.";
-    let message = "123456781234567812345678";
     let mut bl = RustCryptoBlowfish::new(key,message);
     bl.encrypt();
     let resultVec = bl.decrypt();
 }
-
+#[wasm_bindgen]
+pub fn rust_crypto_blowfish_key_iv_setup(key: &str){
+    let mut bl = RustCryptoBlowfish::new(key,"");
+}
 
 
 

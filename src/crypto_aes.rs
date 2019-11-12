@@ -8,12 +8,12 @@ use crypto::buffer::{ ReadBuffer, WriteBuffer, BufferResult };
 
 
 #[wasm_bindgen]
-pub fn rust_crypto_aes_encrypt_decrypt(message: &str, key: &str){
-    let encrypted = RustCryptoAes::encrypt(message, key);
-    let decrypted = RustCryptoAes::decrypt(encrypted, key);
+pub fn rust_crypto_aes_encrypt_decrypt(message: &str, key: &str, iv: &str){
+    let encrypted = RustCryptoAes::encrypt(message, key, iv);
+    let decrypted = RustCryptoAes::decrypt(encrypted, key, iv);
 }
 #[wasm_bindgen]
-pub fn rust_crypto_aes_key_iv_setup(message: &str, key: &str){
+pub fn rust_crypto_aes_key_iv_setup(key: &str, iv : &str){
     let key = b"very secret key-the most secret.";
     let iv = b"my noncemy nonce";
     let mut encryptor = aes::cbc_encryptor(
@@ -29,16 +29,20 @@ struct RustCryptoAes{
 }
 
 impl RustCryptoAes{
-    pub fn encrypt(messag: &str, key: &str) -> Vec<u8>{
-        let key = b"very secret key-the most secret.";
-        let iv = b"my noncemy nonce";
+    pub fn encrypt(messag: &str, key: &str, iv: &str) -> Vec<u8>{
+        let key = key.as_bytes();
+        let (key, _right) = key.split_at(32);
+        let iv = iv.as_bytes();
+        let (iv, _right) = iv.split_at(16);
         let msg = messag.as_bytes();
         let ret = RustCryptoAes::private_encrypt(msg,key,iv).ok().unwrap();
         return ret;
     }
-    pub fn decrypt(encrypted_data: Vec<u8>, key: &str) -> Vec<u8>{
-        let key = b"very secret key-the most secret.";
-        let iv = b"my noncemy nonce";
+    pub fn decrypt(encrypted_data: Vec<u8>, key: &str, iv: &str) -> Vec<u8>{
+        let key = key.as_bytes();
+        let (key, _right) = key.split_at(32);
+        let iv = iv.as_bytes();
+        let (iv, _right) = iv.split_at(16);
         let data = encrypted_data.as_slice();
         let ret = RustCryptoAes::private_decrypt(data,key,iv).ok().unwrap();
         return ret;

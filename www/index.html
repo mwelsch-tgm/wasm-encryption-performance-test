@@ -10,9 +10,8 @@
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <script src="./bootstrap.js"></script>
     Text to be encrypted:<input type="text" id="text1" value="plaintext"><br>
-    How often the encryption should be run:<input type="number" id="number1" value="10"><br>
-    How often all tests should be run (to determine ±): <input type="number" id="number2" value="10"><br>
-    <input type="button" value="runTests" id="run" >
+    Key(Needs to be at least 32 characters, else tests will fail): <input type="text" id="key" value="an example very very secret key."><br>
+    IV(Needs to be at least 16 characters, else tests will fail): <input type="text" id="iv" value="my noncemy nonce"><br>
     <input type="button" value="Benchmark.js" id="bench" >
     <input type="button" value="test whole alphabet" id="runAlphabet" >
   <div id="tbl">
