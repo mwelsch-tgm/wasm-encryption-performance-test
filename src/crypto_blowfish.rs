@@ -29,7 +29,7 @@ impl RustCryptoBlowfish{
 
     pub fn new(key: &str, message: &str) -> RustCryptoBlowfish{
         let key = key.as_bytes();
-        //let key = b"very secret key-the most secret.";
+        let (key, _right) = key.split_at(32);
         let blfish = Blowfish::new(key);
         let encrypted  =  Vec::from(message);
         let message = String::from(message);

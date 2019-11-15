@@ -33,12 +33,12 @@ pub struct BlowfishCbc{
 
 impl BlowfishCbc{
     pub fn new_cipher(key: &str, iv: &str) -> CbcBlowfish{
-        let key = key.as_bytes();
+        /*let key = key.as_bytes();
         let (key, _right) = key.split_at(32);
         let iv = iv.as_bytes();
-        let (iv, _right) = iv.split_at(16);
-      /*  let key = hex!(key);
-        let iv = hex!(iv);*/
+        let (iv, _right) = iv.split_at(16);*/
+        let key = hex!("000102030405060708090a0b0c0d0e0f");
+        let iv = hex!("12345678912e3456");
         let cipher = CbcBlowfish::new_var(&key, &iv).unwrap();
         //let ciphertext = Vec::new();
         return cipher;
