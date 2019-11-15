@@ -24,6 +24,16 @@ pub fn blowfish_cbc_key_iv_setup(key: &str, iv: &str){
     //let mut buffer = BlowfishCbc::new_buffer(message);
 }
 
+#[wasm_bindgen]
+pub fn blowfish_cbc_output_size(message: &str, key: &str, iv: &str) -> String{
+    let cipher = BlowfishCbc::new_cipher(key, iv);
+    let mut buffer = BlowfishCbc::new_buffer(message);
+    let mut vec = BlowfishCbc::encrypt(cipher,buffer,message.len());
+    let len1 = message.as_bytes().to_vec().len() as f32;
+    let len2 = vec.len() as f32;
+    let percent = len2/len1*100.0;
+    return percent.to_string();
+}
 
 type CbcBlowfish = Cbc<Blowfish, Pkcs7>;
 
