@@ -12,8 +12,12 @@
     Text to be encrypted:<input type="text" id="text1" value="plaintext"><br>
     Key(Needs to be at least 32 characters, else tests will fail): <input type="text" id="key" value="an example very very secret key."><br>
     IV(Needs to be at least 16 characters, else tests will fail): <input type="text" id="iv" value="my noncemy nonce"><br>
-    <input type="button" value="Benchmark.js" id="bench" >
-    <input type="button" value="test whole alphabet" id="runAlphabet" >
+    How many times should an operation be run? If this is greater, the test will take longer but results are more relevant <input type="number" id="times" value="50"><br>
+    <input type="button" value="test whole alphabet 16 chars" id="alphabet16">
+    <input type="button" value="test whole alphabet" id="alphabet">
+    <input type="button" value="test string length 1-64" id="randString">
+    <input type="button" value="test KEY and IV setup" id="keyIVSetup">
+    <input type="button" value="random test function" id="testing">
   <div id="tbl">
 
   </div>

@@ -8,13 +8,13 @@ window.Benchmark = Benchmark;
 
 Benchmark.options.maxTime = 1;
 
-
+var divClone;
 var dataset = new Map();
-const cryptos = ["c2chacha20_encrypt_decrypt",
-    "blowfish_cbc_encrypt_decrypt",
-    "rust_crypto_aes_encrypt_decrypt",
-    "aes_256_gcm_siv_encrypt_decrypt",
-    "rust_crypto_blowfish_encrypt_decrypt"];
+const cryptos = ["ChaCha20",
+    "Blowfish_cbc",
+    "rust-crypto-aes",
+    "AES_GCM_SIV",
+    "rust-crypto-blowfish"];
 const colors =  ['rgba(255, 159, 64, 1)',
     'rgba(54, 162, 235, 1)',
     'rgba(255, 206, 86, 1)',
@@ -26,70 +26,81 @@ const key_iv_setup_test = () => {
     var key_iv_suite = new Benchmark.Suite;
     var key = document.getElementById("key").value;
     var iv = document.getElementById("iv").value;
-    var times = 100;
+    var times = parseInt(document.getElementById("times").value);
     key_iv_suite.on('cycle', function(event) {
         console.log(String(event.target));
     });
-    key_iv_suite.add("c2chacha20_key_iv_setup", function (){
+    key_iv_suite.add(cryptos[0], function (){
         for (let i = 0; i < times; i++) {
             wasm.c2chacha20_key_iv_setup(key,iv);
         }
     });
-    key_iv_suite.add("blowfish_cbc_key_iv_setup", function (){
+    key_iv_suite.add(cryptos[1], function (){
         for (let i = 0; i < times; i++) {
             wasm.blowfish_cbc_key_iv_setup(key,iv);
         }
     });
-    key_iv_suite.add("rust_crypto_aes_key_iv_setup", function (){
+    key_iv_suite.add(cryptos[2], function (){
         for (let i = 0; i < times; i++) {
             wasm.rust_crypto_aes_key_iv_setup(key,iv);
         }
     });
-    key_iv_suite.add("aes_256_gcm_siv_key_iv_setup", function (){
+    key_iv_suite.add(cryptos[3], function (){
         for (let i = 0; i < times; i++) {
             wasm.aes_256_gcm_siv_key_iv_setup(key,iv);
         }
     });
-    key_iv_suite.add("rust_crypto_blowfish_key_iv_setup", function (){
+    key_iv_suite.add(cryptos[4], function (){
         for (let i = 0; i < times; i++) {
             wasm.rust_crypto_blowfish_key_iv_setup(key);
         }
     });
     key_iv_suite.on('complete', function() {
-        var entry = {};
+        var entry = new Map();
         for (let i = 0; i < this.length; i++) {
-            entry[this[i].name] = this[i].stats.mean;
+            entry.set(this[i].name,this[i].stats.mean);
         }
         dataset.set("key_iv_setup", entry);
     });
     // run async
-    key_iv_suite.run({ 'async': false });
+    key_iv_suite.run({ 'async': true });
 }
 
 const encrypt_decrypt_test = () => {
-
     var key = document.getElementById("key").value;
     var iv = document.getElementById("iv").value;
     var text = document.getElementById("text1").value;
     wasm.aes_256_gcm_siv_encrypt_decrypt(text,key,iv);
     var encrypt_decrypt_suite = new Benchmark.Suite;
+    var times = parseInt(document.getElementById("times").value);
     encrypt_decrypt_suite.on('cycle', function(event) {
         console.log(String(event.target));
     });
-    encrypt_decrypt_suite.add("c2chacha20_encrypt_decrypt", function (){
-        wasm.c2chacha20_encrypt_decrypt(text,key,iv);
+    encrypt_decrypt_suite.add(cryptos[0], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.c2chacha20_encrypt_decrypt(text,key,iv);
+        }
     });
-    encrypt_decrypt_suite.add("blowfish_cbc_encrypt_decrypt", function (){
-        wasm.blowfish_cbc_encrypt_decrypt(text,key,iv);
+    encrypt_decrypt_suite.add(cryptos[1], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.blowfish_cbc_encrypt_decrypt(text,key,iv);
+        }
     });
-    encrypt_decrypt_suite.add("rust_crypto_aes_encrypt_decrypt", function (){
-        wasm.rust_crypto_aes_encrypt_decrypt(text,key,iv);
+    encrypt_decrypt_suite.add(cryptos[2], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.rust_crypto_aes_encrypt_decrypt(text,key,iv);
+        }
     });
-    encrypt_decrypt_suite.add("aes_256_gcm_siv_encrypt_decrypt", function (){
-        wasm.aes_256_gcm_siv_encrypt_decrypt(text,key,iv);
+    encrypt_decrypt_suite.add(cryptos[3], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.aes_256_gcm_siv_encrypt_decrypt(text,key,iv);
+        }
+
     });
-    encrypt_decrypt_suite.add("rust_crypto_blowfish_encrypt_decrypt", function (){
-        wasm.rust_crypto_blowfish_encrypt_decrypt(text,key);
+    encrypt_decrypt_suite.add(cryptos[4], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.rust_crypto_blowfish_encrypt_decrypt(text,key);
+        }
     });
     encrypt_decrypt_suite.on('complete', function() {
         var entry = new Map();
@@ -99,12 +110,7 @@ const encrypt_decrypt_test = () => {
         dataset.set(text,entry);
     });
     // run async
-    encrypt_decrypt_suite.run({ 'async': false });
-}
-const testing = () => {
-   // encrypt_decrypt_test();
-   // visualizeDataset();
-    //key_iv_setup_test();
+    encrypt_decrypt_suite.run({ 'async': true });
 }
 const testAlphabet = () => {
     whatIsTested = "alphabet";
@@ -140,11 +146,56 @@ const testRandString = () => {
     visualizeDataset();
 }
 
-const testSetup = () => {
+const testKeyIVSetup = () => {
     key_iv_setup_test();
+    visualizeKeyIVSetup();
 }
-const visualizeSetup = () => {
-    
+const visualizeKeyIVSetup = () => {
+    var data = [];
+    var tmp = dataset.get("key_iv_setup");
+    for (let i = 0; i < cryptos.length; i++) {
+        data.push(tmp.get(cryptos[i]));
+    }
+    $("#myChart").replaceWith(divClone.clone());
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: cryptos,
+            datasets: [{
+                label: 'avg ms',
+                //TODO insert data dynamically
+                data: data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
 }
 
 //when called there should not be key_iv results in the resultset
@@ -177,7 +228,7 @@ const visualizeDataset = () => {
         }
 
     }
-
+    $("#myChart").replaceWith(divClone.clone());
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
@@ -196,9 +247,18 @@ const visualizeDataset = () => {
         }
     });
 }
-
+const testing = () => {
+    var key = document.getElementById("key").value;
+    var iv = document.getElementById("iv").value;
+    var text = document.getElementById("text1").value;
+    console.log(wasm.blowfish_cbc_output_size(text,key,iv));
+}
 
 $(document).ready(function() {
-    $("#runAlphabet").click(testAlphabet);
-    $("#bench").click(testing);
+    divClone = $("#myChart").clone();
+    $("#alphabet").click(testAlphabet);
+    $("#alphabet16").click(testAlphabet16);
+    $("#randString").click(testRandString);
+    $("#keyIVSetup").click(testKeyIVSetup);
+    $("#testing").click(testing);
 });
