@@ -18,7 +18,15 @@ pub fn rust_crypto_blowfish_key_iv_setup(key: &str){
     let mut bl = RustCryptoBlowfish::new(key,"");
 }
 
-
+#[wasm_bindgen]
+pub fn rust_crypto_blowfish_output_size(message: &str, key: &str, iv: &str) -> String{
+    let mut bl = RustCryptoBlowfish::new(key,message);
+    bl.encrypt();
+    let len1 = message.as_bytes().to_vec().len() as f32;
+    let len2 = bl.get_encrypted().len() as f32;
+    let percent = len2/len1*100.0;
+    return len2.to_string();
+}
 
 struct RustCryptoBlowfish{
     message: String,
@@ -48,6 +56,14 @@ impl RustCryptoBlowfish{
             test.push_str(" ");
         }
         self.message = test;
+    }
+
+    pub fn get_message(&mut self) -> String{
+        return self.message.clone();
+    }
+
+    pub fn get_encrypted(&mut self) -> Vec<u8>{
+        return self.encrypted.clone();
     }
 
     pub fn encrypt(&mut self){

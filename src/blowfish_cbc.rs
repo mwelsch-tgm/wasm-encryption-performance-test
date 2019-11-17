@@ -54,16 +54,16 @@ impl BlowfishCbc{
         return cipher;
     }
 
-    pub fn new_buffer(message: &str) -> [u8; 32]{
+    pub fn new_buffer(message: &str) -> [u8; 128]{
         let pos = message.len();
         let plaintext = message.as_bytes();
-        let mut buffer = [0u8; 32];
+        let mut buffer = [0u8; 128];
         buffer[..pos].copy_from_slice(plaintext);
         return buffer;
     }
 
 
-    pub fn encrypt(cipher: CbcBlowfish,mut buffer: [u8;32], plaintextLen: usize) -> Vec<u8>{
+    pub fn encrypt(cipher: CbcBlowfish,mut buffer: [u8;128], plaintextLen: usize) -> Vec<u8>{
         let ciphertext = cipher.encrypt(&mut buffer, plaintextLen).unwrap();
         return ciphertext.to_vec();
     }

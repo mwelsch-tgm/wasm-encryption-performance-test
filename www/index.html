@@ -13,11 +13,12 @@
     Key(Needs to be at least 32 characters, else tests will fail): <input type="text" id="key" value="an example very very secret key."><br>
     IV(Needs to be at least 16 characters, else tests will fail): <input type="text" id="iv" value="my noncemy nonce"><br>
     How many times should an operation be run? If this is greater, the test will take longer but results are more relevant <input type="number" id="times" value="50"><br>
+    Length from where the size comparison should start <input type="number" id="length" value="1">
     <input type="button" value="test whole alphabet 16 chars" id="alphabet16">
     <input type="button" value="test whole alphabet" id="alphabet">
     <input type="button" value="test string length 1-64" id="randString">
     <input type="button" value="test KEY and IV setup" id="keyIVSetup">
-    <input type="button" value="random test function" id="testing">
+    <input type="button" value="Input vs Output size" id="inputOutputSize">
   <div id="tbl">
 
   </div>

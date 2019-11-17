@@ -63,7 +63,7 @@ const key_iv_setup_test = () => {
         dataset.set("key_iv_setup", entry);
     });
     // run async
-    key_iv_suite.run({ 'async': true });
+    key_iv_suite.run({ 'async': false });
 }
 
 const encrypt_decrypt_test = () => {
@@ -110,11 +110,12 @@ const encrypt_decrypt_test = () => {
         dataset.set(text,entry);
     });
     // run async
-    encrypt_decrypt_suite.run({ 'async': true });
+    encrypt_decrypt_suite.run({ 'async': false });
 }
 const testAlphabet = () => {
+    dataset = new Map();
     whatIsTested = "alphabet";
-    var alphabet = "abcdefghijklmnopqrstuvwxyzäöüßABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ".split("");
+    var alphabet = "ab".split("");
     for (let i = 0; i<alphabet.length;i++){
         document.getElementById("text1").value = alphabet[i];
         encrypt_decrypt_test();
@@ -122,6 +123,7 @@ const testAlphabet = () => {
     visualizeDataset();
 }
 const testAlphabet16 = () => {
+    dataset = new Map();
     whatIsTested = "alphabet";
     var alphabet = "abcdefghijklmnopqrstuvwxyzäöüßABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ".split("");
     for (let i = 0; i<alphabet.length;i++){
@@ -131,6 +133,7 @@ const testAlphabet16 = () => {
     visualizeDataset();
 }
 const testRandString = () => {
+    dataset = new Map();
     whatIsTested = "randString";
     var alphabet = "abcdefghijklmnopqrstuvwxyzäöüßABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ";
     for (let i = 1; i<=64;i++){
@@ -147,6 +150,7 @@ const testRandString = () => {
 }
 
 const testKeyIVSetup = () => {
+    dataset = new Map();
     key_iv_setup_test();
     visualizeKeyIVSetup();
 }
@@ -223,10 +227,13 @@ const visualizeDataset = () => {
         if(whatIsTested=="alphabet"){
             label.push(key[0]);
         }
-        else if (whatIsTested == "randString"){
+        else if (whatIsTested == "randString" || whatIsTested== "inputOutputSize"){
             label.push(key.length);
         }
-
+    }
+    if(whatIsTested == "inputOutputSize"){
+        label.pop();
+        data.pop();
     }
     $("#myChart").replaceWith(divClone.clone());
     var ctx = document.getElementById('myChart').getContext('2d');
@@ -254,11 +261,41 @@ const testing = () => {
     console.log(wasm.blowfish_cbc_output_size(text,key,iv));
 }
 
+//generate a graph with the size
+const inputOutputSizeData = () => {
+    whatIsTested = "inputOutputSize";
+    var key = document.getElementById("key").value;
+    var iv = document.getElementById("iv").value;
+    var alphabet = "abcdefghijklmnopqrstuvwxyzäöüßABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ";
+    let i = document.getElementById("length").value;
+    for (; i < 64; i++) {
+        var data = new Map();
+        //generate random string
+        //source: https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+        var str = "";
+        for (var j = 0; j < i; j++) {
+            str += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+        }
+        console.log("hi");
+        data.set(cryptos[0], parseFloat(wasm.c2chacha20_output_size(str,key,iv)));
+        data.set(cryptos[1], parseFloat(wasm.blowfish_cbc_output_size(str,key,iv)));
+        data.set(cryptos[2], parseFloat(wasm.rust_crypto_aes_output_size(str,key,iv)));
+        data.set(cryptos[3], parseFloat(wasm.aes_256_gcm_siv_output_size(str,key,iv)));
+        //data.set(cryptos[4], parseFloat(wasm.rust_crypto_blowfish_output_size(str,key,iv)));
+        dataset.set(str,data);
+    }
+}
+const testInputOutputSize = () => {
+    dataset = new Map();
+    inputOutputSizeData();
+    visualizeDataset();
+}
+
 $(document).ready(function() {
     divClone = $("#myChart").clone();
     $("#alphabet").click(testAlphabet);
     $("#alphabet16").click(testAlphabet16);
     $("#randString").click(testRandString);
     $("#keyIVSetup").click(testKeyIVSetup);
-    $("#testing").click(testing);
+    $("#inputOutputSize").click(testInputOutputSize);
 });

@@ -23,6 +23,16 @@ pub fn rust_crypto_aes_key_iv_setup(key: &str, iv : &str){
         blockmodes::PkcsPadding);
 }
 
+#[wasm_bindgen]
+pub fn rust_crypto_aes_output_size(message: &str, key: &str, iv: &str) -> String{
+
+    let encrypted = RustCryptoAes::encrypt(message, key, iv);
+    let len1 = message.as_bytes().to_vec().len() as f32;
+    let len2 = encrypted.len() as f32;
+    let percent = len2/len1*100.0;
+    return percent.to_string();
+}
+
 
 struct RustCryptoAes{
 

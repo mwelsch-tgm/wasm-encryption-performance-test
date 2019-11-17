@@ -19,6 +19,17 @@ pub fn c2chacha20_key_iv_setup(key: &str, iv: &str){
     //let v1 = encrypt.set_message(message);
 }
 
+#[wasm_bindgen]
+pub fn c2chacha20_output_size(message: &str, key: &str, iv: &str) -> String{
+    let mut encrypt = C2ChaCha20Encryption::new(key, iv);
+    let v1 = encrypt.set_message(message);
+    encrypt.encryption();
+    let len1 = message.as_bytes().to_vec().len() as f32;
+    let len2 = encrypt.get_message().len() as f32;
+    let percent = len2/len1*100.0;
+    return percent.to_string();
+}
+
 
 pub struct C2ChaCha20Encryption{
     c2chacha20: ChaCha20,
@@ -48,6 +59,11 @@ impl C2ChaCha20Encryption{
         self.buffer = buffer;
         return self.buffer.clone();
     }
+
+    pub fn get_message(&mut self) -> Vec<u8> {
+        return self.buffer.clone();
+    }
+
     pub fn encryption(&mut self) {
         self.c2chacha20.apply_keystream(&mut self.buffer);
     }
