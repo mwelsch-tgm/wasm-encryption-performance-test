@@ -2,7 +2,7 @@ mod utils;
 
 use wasm_bindgen::prelude::*;
 
-extern crate aes_gcm_siv;
+
 
 // blowfish
 #[macro_use] extern crate hex_literal;
@@ -11,13 +11,16 @@ mod c2_chacha20;
 mod blowfish_cbc;
 mod crypto_aes;
 mod crypto_blowfish;
+mod chacha20_poly1305;
 
 // aesgcmsiv
+extern crate aes_gcm_siv;
 use aes_gcm_siv::{Aes256GcmSiv, AesGcmSiv}; // Or `Aes128GcmSiv`
 use aead::{Aead, NewAead, generic_array::GenericArray};
 
 //general
 use wasm_bindgen::__rt::core::ptr::null;
+use blowfish::block_cipher_trait::generic_array::typenum::UInt;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -56,7 +59,7 @@ pub fn aes_256_gcm_siv_key_iv_setup(key: &str, iv: &str){
     let aead = Aes256GcmSiv::new(key);
     let iv = iv.as_bytes();
     let (iv, _right) = iv.split_at(12);
-   // let nonce : GenericArray<u8, aead::generic_array::ArrayLength<u8>> = GenericArray::from_slice(iv); // 96-bits; unique per message
+    //let nonce : GenericArray<u8, i32> = GenericArray::from_slice(iv); // 96-bits; unique per message
 }
 
 #[wasm_bindgen]

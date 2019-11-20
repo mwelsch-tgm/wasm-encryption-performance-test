@@ -10,16 +10,20 @@ Benchmark.options.maxTime = 1;
 
 var divClone;
 var dataset = new Map();
-const cryptos = ["ChaCha20",
-    "Blowfish_cbc",
+const cryptos = ["C2_ChaCha20",
+    "C2_ChaCha20+poly1305",
+    "ChaCha20-poly1305",
+    "Blowfish",
     "rust-crypto-aes",
-    "AES_GCM_SIV",
+    "AES-GCM-SIV",
     "rust-crypto-blowfish"];
 const colors =  ['rgba(255, 159, 64, 1)',
     'rgba(54, 162, 235, 1)',
     'rgba(255, 206, 86, 1)',
     'rgba(75, 192, 192, 1)',
     'rgba(153, 102, 255, 1)',
+    'rgba(0,255,30, 1)',
+    'rgb(255,20,0)'
    ];
 var whatIsTested = null;
 const key_iv_setup_test = () => {
@@ -37,20 +41,30 @@ const key_iv_setup_test = () => {
     });
     key_iv_suite.add(cryptos[1], function (){
         for (let i = 0; i < times; i++) {
-            wasm.blowfish_cbc_key_iv_setup(key,iv);
+            wasm.c2chacha20_poly1305_key_iv_setup(key,iv);
         }
     });
     key_iv_suite.add(cryptos[2], function (){
         for (let i = 0; i < times; i++) {
-            wasm.rust_crypto_aes_key_iv_setup(key,iv);
+            wasm.chacha20_poly1305_key_iv_setup(key,iv);
         }
     });
     key_iv_suite.add(cryptos[3], function (){
         for (let i = 0; i < times; i++) {
-            wasm.aes_256_gcm_siv_key_iv_setup(key,iv);
+            wasm.blowfish_cbc_key_iv_setup(key,iv);
         }
     });
     key_iv_suite.add(cryptos[4], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.rust_crypto_aes_key_iv_setup(key,iv);
+        }
+    });
+    key_iv_suite.add(cryptos[5], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.aes_256_gcm_siv_key_iv_setup(key,iv);
+        }
+    });
+    key_iv_suite.add(cryptos[6], function (){
         for (let i = 0; i < times; i++) {
             wasm.rust_crypto_blowfish_key_iv_setup(key);
         }
@@ -83,21 +97,31 @@ const encrypt_decrypt_test = () => {
     });
     encrypt_decrypt_suite.add(cryptos[1], function (){
         for (let i = 0; i < times; i++) {
-            wasm.blowfish_cbc_encrypt_decrypt(text,key,iv);
+            wasm.c2chacha20_poly1305_encrypt_decrypt(text,key,iv);
         }
     });
     encrypt_decrypt_suite.add(cryptos[2], function (){
         for (let i = 0; i < times; i++) {
-            wasm.rust_crypto_aes_encrypt_decrypt(text,key,iv);
+            wasm.chacha20_poly1305_encrypt_decrypt(text,key,iv);
         }
     });
     encrypt_decrypt_suite.add(cryptos[3], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.blowfish_cbc_encrypt_decrypt(text,key,iv);
+        }
+    });
+    encrypt_decrypt_suite.add(cryptos[4], function (){
+        for (let i = 0; i < times; i++) {
+            wasm.rust_crypto_aes_encrypt_decrypt(text,key,iv);
+        }
+    });
+    encrypt_decrypt_suite.add(cryptos[5], function (){
         for (let i = 0; i < times; i++) {
             wasm.aes_256_gcm_siv_encrypt_decrypt(text,key,iv);
         }
 
     });
-    encrypt_decrypt_suite.add(cryptos[4], function (){
+    encrypt_decrypt_suite.add(cryptos[6], function (){
         for (let i = 0; i < times; i++) {
             wasm.rust_crypto_blowfish_encrypt_decrypt(text,key);
         }
@@ -115,7 +139,7 @@ const encrypt_decrypt_test = () => {
 const testAlphabet = () => {
     dataset = new Map();
     whatIsTested = "alphabet";
-    var alphabet = "ab".split("");
+    var alphabet = "abcdefghijklmnopqrstuvwxyzäöüßABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ".split("");
     for (let i = 0; i<alphabet.length;i++){
         document.getElementById("text1").value = alphabet[i];
         encrypt_decrypt_test();
@@ -171,20 +195,22 @@ const visualizeKeyIVSetup = () => {
                 //TODO insert data dynamically
                 data: data,
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
+                    colors[0],
+                    colors[1],
+                    colors[2],
+                    colors[3],
+                    colors[4],
+                    colors[5],
+                    colors[6]
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
+                    colors[0],
+                    colors[1],
+                    colors[2],
+                    colors[3],
+                    colors[4],
+                    colors[5],
+                    colors[6]
                 ],
                 borderWidth: 1
             }]
@@ -231,10 +257,6 @@ const visualizeDataset = () => {
             label.push(key.length);
         }
     }
-    if(whatIsTested == "inputOutputSize"){
-        label.pop();
-        data.pop();
-    }
     $("#myChart").replaceWith(divClone.clone());
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(ctx, {
@@ -277,11 +299,15 @@ const inputOutputSizeData = () => {
             str += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
         }
         console.log("hi");
+        wasm.rust_crypto_blowfish_encrypt_decrypt("12345678",key);
         data.set(cryptos[0], parseFloat(wasm.c2chacha20_output_size(str,key,iv)));
-        data.set(cryptos[1], parseFloat(wasm.blowfish_cbc_output_size(str,key,iv)));
-        data.set(cryptos[2], parseFloat(wasm.rust_crypto_aes_output_size(str,key,iv)));
-        data.set(cryptos[3], parseFloat(wasm.aes_256_gcm_siv_output_size(str,key,iv)));
-        //data.set(cryptos[4], parseFloat(wasm.rust_crypto_blowfish_output_size(str,key,iv)));
+        data.set(cryptos[1], parseFloat(wasm.c2chacha20_poly1305_output_size(str,key,iv)));
+        data.set(cryptos[2], parseFloat(wasm.chacha20_poly1305_output_size(str,key,iv)));
+        data.set(cryptos[3], parseFloat(wasm.blowfish_cbc_output_size(str,key,iv)));
+        data.set(cryptos[4], parseFloat(wasm.rust_crypto_aes_output_size(str,key,iv)));
+        data.set(cryptos[5], parseFloat(wasm.aes_256_gcm_siv_output_size(str,key,iv)));
+        data.set(cryptos[6], parseFloat(wasm.rust_crypto_blowfish_output_size(str,key)));
+        console.log(wasm.c2chacha20_output_size(str,key,iv));
         dataset.set(str,data);
     }
 }

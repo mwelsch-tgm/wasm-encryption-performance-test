@@ -12,6 +12,7 @@ pub fn rust_crypto_blowfish_encrypt_decrypt(message: &str, key: &str){
     let mut bl = RustCryptoBlowfish::new(key,message);
     bl.encrypt();
     let resultVec = bl.decrypt();
+    assert_eq!(message.as_bytes().to_vec(),resultVec);
 }
 #[wasm_bindgen]
 pub fn rust_crypto_blowfish_key_iv_setup(key: &str){
@@ -19,13 +20,13 @@ pub fn rust_crypto_blowfish_key_iv_setup(key: &str){
 }
 
 #[wasm_bindgen]
-pub fn rust_crypto_blowfish_output_size(message: &str, key: &str, iv: &str) -> String{
+pub fn rust_crypto_blowfish_output_size(message: &str, key: &str) -> String{
     let mut bl = RustCryptoBlowfish::new(key,message);
     bl.encrypt();
     let len1 = message.as_bytes().to_vec().len() as f32;
     let len2 = bl.get_encrypted().len() as f32;
     let percent = len2/len1*100.0;
-    return len2.to_string();
+    return percent.to_string();
 }
 
 struct RustCryptoBlowfish{
@@ -41,15 +42,17 @@ impl RustCryptoBlowfish{
         let blfish = Blowfish::new(key);
         let encrypted  =  Vec::from(message);
         let message = String::from(message);
-        let obj = RustCryptoBlowfish{
+        let message2 = message.clone();
+        let mut obj = RustCryptoBlowfish{
             message,
             blfish,
             encrypted
         };
+        obj.set_message(message2);
         return obj;
     }
 
-    pub fn set_message(&mut self, message: &str){
+    pub fn set_message(&mut self, message: String){
         //make sure message is a multiple of 8 long
         let mut test = String::from(message);
         while test.len()%8 !=0 {
