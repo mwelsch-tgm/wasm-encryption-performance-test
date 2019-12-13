@@ -8,7 +8,17 @@ cd www
 npm install
 npm run start
 ```
+### Build and copy to server
+
+```
+wasm-pack build
+wasm-pack publish
+cd www/dist/
+scp -P port * moritz@myserver:/home/moritz/test-encryption/dist
+```
+
 now the website is served on `localhost:8080`
+
 ### rust-crypto
 - aes has complex "sample" code
 - works(?)
